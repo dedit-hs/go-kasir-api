@@ -4,9 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
+
+	"github.com/spf13/viper"
 )
+
+type Config struct {
+	Port string `mapstructure:"PORT"`
+}
 
 type Product struct {
 	ID    int    `json:"id"`
@@ -194,6 +201,17 @@ func DeleteCategory(w http.ResponseWriter, r *http.Request, categoryId int) {
 }
 
 func main() {
+	viper.AutomaticEnv()
+	viper.SetEnvKeyReplacer(strings.NewReplacer("_", "."))
+
+	if _, err := os.Stat(".env"); err == nil {
+		viper.SetConfigFile(".env")
+		viper.ReadInConfig()
+	}
+
+	config := Config{
+		Port: viper.GetString("PORT"),
+	}
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		w.Header().Set("Content-Type", "application/json")
@@ -268,8 +286,8 @@ func main() {
 		}
 	})
 
-	fmt.Println("Server started on :8080")
-	err := http.ListenAndServe(":8080", nil)
+	fmt.Println("Server started on :" + config.Port)
+	err := http.ListenAndServe(":"+config.Port, nil)
 	if err != nil {
 		fmt.Println("Error starting server:", err)
 	}
