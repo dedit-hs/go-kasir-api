@@ -18,9 +18,9 @@ func InitDB(connectionString string) (*sql.DB, error) {
 		return nil, error
 	}
 
-	db.SetMaxOpenConns(10)
+	db.SetMaxOpenConns(25)
 	db.SetMaxIdleConns(5)
 
-	log.Println("Database connection initialized")
+	log.Println("Database connection initialized successfully")
 	return db, nil
 }
