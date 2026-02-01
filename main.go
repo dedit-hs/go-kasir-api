@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"go-kasir-api/database"
+	"log"
 	"net/http"
 	"os"
 	"strconv"
@@ -12,7 +14,8 @@ import (
 )
 
 type Config struct {
-	Port string `mapstructure:"PORT"`
+	Port   string `mapstructure:"PORT"`
+	DBConn string `mapstructure:"DB_CONN"`
 }
 
 type Product struct {
@@ -210,7 +213,8 @@ func main() {
 	}
 
 	config := Config{
-		Port: viper.GetString("PORT"),
+		Port:   viper.GetString("PORT"),
+		DBConn: viper.GetString("DB_CONN"),
 	}
 	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
@@ -286,8 +290,16 @@ func main() {
 		}
 	})
 
-	fmt.Println("Server started on :" + config.Port)
-	err := http.ListenAndServe(":"+config.Port, nil)
+	db, err := database.InitDB(config.DBConn)
+	if err != nil {
+		log.Println("Failed to initialize database:", err)
+		return
+	}
+
+	defer db.Close()
+
+	fmt.Println("Srver started on :" + config.Port)
+	err = http.ListenAndServe(":"+config.Port, nil)
 	if err != nil {
 		fmt.Println("Error starting server:", err)
 	}
