@@ -36,8 +36,7 @@ func main() {
 
 	db, err := database.InitDB(config.DBConn)
 	if err != nil {
-		log.Println("Failed to initialize database:", err)
-		return
+		log.Fatal("Failed to initialize database:", err)
 	}
 
 	defer db.Close()
@@ -61,8 +60,9 @@ func main() {
 	http.HandleFunc("/api/categories", categoryHandler.HandleCategories)
 	http.HandleFunc("/api/categories/{id}", categoryHandler.HandleCategoryByID)
 
-	fmt.Println("Srver started on :" + config.Port)
-	err = http.ListenAndServe(":"+config.Port, nil)
+	addr := "0.0.0.0:" + config.Port
+	fmt.Println("Server started on :" + addr)
+	err = http.ListenAndServe(addr, nil)
 	if err != nil {
 		fmt.Println("Error starting server:", err)
 	}
