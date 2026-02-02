@@ -20,6 +20,13 @@ type Config struct {
 	DBConn string `mapstructure:"DB_CONN"`
 }
 
+func maskConnectionString(conn string) string {
+	if len(conn) > 20 {
+		return conn[:20] + "..." + conn[len(conn)-10:]
+	}
+	return "***"
+}
+
 func main() {
 	viper.AutomaticEnv()
 	viper.SetEnvKeyReplacer(strings.NewReplacer("_", "."))
@@ -33,6 +40,8 @@ func main() {
 		Port:   viper.GetString("PORT"),
 		DBConn: viper.GetString("DB_CONN"),
 	}
+
+	log.Printf("Configuration loaded - Port: %s, DB_CONN: %s", config.Port, maskConnectionString(config.DBConn))
 
 	db, err := database.InitDB(config.DBConn)
 	if err != nil {
