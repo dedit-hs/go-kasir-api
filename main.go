@@ -10,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -29,7 +28,6 @@ func maskConnectionString(conn string) string {
 
 func main() {
 	viper.AutomaticEnv()
-	viper.SetEnvKeyReplacer(strings.NewReplacer("_", "."))
 
 	if _, err := os.Stat(".env"); err == nil {
 		viper.SetConfigFile(".env")
