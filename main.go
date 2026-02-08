@@ -71,6 +71,8 @@ func main() {
 	http.HandleFunc("/api/categories", categoryHandler.HandleCategories)
 	http.HandleFunc("/api/categories/{id}", categoryHandler.HandleCategoryByID)
 	http.HandleFunc("/api/transactions", transactionHandler.HandleTransactions)
+	http.HandleFunc("/api/transactions/reports", transactionHandler.HandleTransactionReport)
+	http.HandleFunc("/api/transactions/reports/today", transactionHandler.HandleTransactionReportToday)
 
 	addr := "0.0.0.0:" + config.Port
 	fmt.Println("Server started on :" + addr)
