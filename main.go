@@ -54,18 +54,25 @@ func main() {
 		json.NewEncoder(w).Encode(map[string]string{"status": "ok"})
 	})
 
-	productRepository := repositories.NewProductRepositories(db)
-	productService := services.NewProductServices(productRepository)
-	productHandler := handlers.NewProductHandlers(productService)
+	productRepository := repositories.NewProductRepository(db)
+	productService := services.NewProductService(productRepository)
+	productHandler := handlers.NewProductHandler(productService)
 
-	categoryRepository := repositories.NewCategoryRepositories(db)
-	categoryService := services.NewCategoryServices(categoryRepository)
-	categoryHandler := handlers.NewCategoryHandlers(categoryService)
+	categoryRepository := repositories.NewCategoryRepository(db)
+	categoryService := services.NewCategoryService(categoryRepository)
+	categoryHandler := handlers.NewCategoryHandler(categoryService)
+
+	transactionRepository := repositories.NewTransactionRepository(db)
+	transactionService := services.NewTransactionService(productRepository, transactionRepository)
+	transactionHandler := handlers.NewTransactionHandler(transactionService)
 
 	http.HandleFunc("/api/products", productHandler.HandleProducts)
 	http.HandleFunc("/api/products/{id}", productHandler.HandleProductByID)
 	http.HandleFunc("/api/categories", categoryHandler.HandleCategories)
 	http.HandleFunc("/api/categories/{id}", categoryHandler.HandleCategoryByID)
+	http.HandleFunc("/api/transactions", transactionHandler.HandleTransactions)
+	http.HandleFunc("/api/transactions/reports", transactionHandler.HandleTransactionReport)
+	http.HandleFunc("/api/transactions/reports/today", transactionHandler.HandleTransactionReportToday)
 
 	addr := "0.0.0.0:" + config.Port
 	fmt.Println("Server started on :" + addr)

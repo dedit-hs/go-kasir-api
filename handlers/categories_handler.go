@@ -9,15 +9,15 @@ import (
 	"strings"
 )
 
-type CategoryHandlers struct {
-	service *services.CategoryServices
+type CategoryHandler struct {
+	service *services.CategoryService
 }
 
-func NewCategoryHandlers(service *services.CategoryServices) *CategoryHandlers {
-	return &CategoryHandlers{service: service}
+func NewCategoryHandler(service *services.CategoryService) *CategoryHandler {
+	return &CategoryHandler{service: service}
 }
 
-func (h *CategoryHandlers) HandleCategories(w http.ResponseWriter, r *http.Request) {
+func (h *CategoryHandler) HandleCategories(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		h.getCategories(w, r)
@@ -28,7 +28,7 @@ func (h *CategoryHandlers) HandleCategories(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func (h *CategoryHandlers) getCategories(w http.ResponseWriter, r *http.Request) {
+func (h *CategoryHandler) getCategories(w http.ResponseWriter, r *http.Request) {
 	categories, err := h.service.GetAll()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -38,7 +38,7 @@ func (h *CategoryHandlers) getCategories(w http.ResponseWriter, r *http.Request)
 	json.NewEncoder(w).Encode(categories)
 }
 
-func (h *CategoryHandlers) createCategory(w http.ResponseWriter, r *http.Request) {
+func (h *CategoryHandler) createCategory(w http.ResponseWriter, r *http.Request) {
 	var category models.Category
 	err := json.NewDecoder(r.Body).Decode(&category)
 	if err != nil {
@@ -57,7 +57,7 @@ func (h *CategoryHandlers) createCategory(w http.ResponseWriter, r *http.Request
 	json.NewEncoder(w).Encode(category)
 }
 
-func (h *CategoryHandlers) HandleCategoryByID(w http.ResponseWriter, r *http.Request) {
+func (h *CategoryHandler) HandleCategoryByID(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		h.getCategoryByID(w, r)
@@ -70,7 +70,7 @@ func (h *CategoryHandlers) HandleCategoryByID(w http.ResponseWriter, r *http.Req
 	}
 }
 
-func (h *CategoryHandlers) getCategoryByID(w http.ResponseWriter, r *http.Request) {
+func (h *CategoryHandler) getCategoryByID(w http.ResponseWriter, r *http.Request) {
 	id := strings.TrimPrefix(r.URL.Path, "/api/categories/")
 	categoryID, err := strconv.Atoi(id)
 
@@ -90,7 +90,7 @@ func (h *CategoryHandlers) getCategoryByID(w http.ResponseWriter, r *http.Reques
 	json.NewEncoder(w).Encode(category)
 }
 
-func (h *CategoryHandlers) updateCategory(w http.ResponseWriter, r *http.Request) {
+func (h *CategoryHandler) updateCategory(w http.ResponseWriter, r *http.Request) {
 	id := strings.TrimPrefix(r.URL.Path, "/api/categories/")
 	categoryID, err := strconv.Atoi(id)
 
@@ -117,7 +117,7 @@ func (h *CategoryHandlers) updateCategory(w http.ResponseWriter, r *http.Request
 	json.NewEncoder(w).Encode(category)
 }
 
-func (h *CategoryHandlers) deleteCategory(w http.ResponseWriter, r *http.Request) {
+func (h *CategoryHandler) deleteCategory(w http.ResponseWriter, r *http.Request) {
 	id := strings.TrimPrefix(r.URL.Path, "/api/categories/")
 	categoryID, err := strconv.Atoi(id)
 
@@ -136,4 +136,3 @@ func (h *CategoryHandlers) deleteCategory(w http.ResponseWriter, r *http.Request
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"message": "Category deleted"})
 }
-

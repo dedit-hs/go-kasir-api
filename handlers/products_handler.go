@@ -9,15 +9,15 @@ import (
 	"strings"
 )
 
-type ProductHandlers struct {
-	service *services.ProductServices
+type ProductHandler struct {
+	service *services.ProductService
 }
 
-func NewProductHandlers(service *services.ProductServices) *ProductHandlers {
-	return &ProductHandlers{service: service}
+func NewProductHandler(service *services.ProductService) *ProductHandler {
+	return &ProductHandler{service: service}
 }
 
-func (h *ProductHandlers) HandleProducts(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) HandleProducts(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		h.GetAll(w, r)
@@ -28,7 +28,7 @@ func (h *ProductHandlers) HandleProducts(w http.ResponseWriter, r *http.Request)
 	}
 }
 
-func (h *ProductHandlers) GetAll(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 	name := r.URL.Query().Get("name")
 	products, err := h.service.GetAll(name)
 	if err != nil {
@@ -40,7 +40,7 @@ func (h *ProductHandlers) GetAll(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(products)
 }
 
-func (h *ProductHandlers) Create(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var product models.Product
 	err := json.NewDecoder(r.Body).Decode(&product)
 	if err != nil {
@@ -59,7 +59,7 @@ func (h *ProductHandlers) Create(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(product)
 }
 
-func (h *ProductHandlers) HandleProductByID(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) HandleProductByID(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		h.GetByID(w, r)
@@ -72,7 +72,7 @@ func (h *ProductHandlers) HandleProductByID(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func (h *ProductHandlers) GetByID(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	id := strings.TrimPrefix(r.URL.Path, "/api/products/")
 	productId, err := strconv.Atoi(id)
 
@@ -92,7 +92,7 @@ func (h *ProductHandlers) GetByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(product)
 }
 
-func (h *ProductHandlers) Update(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) Update(w http.ResponseWriter, r *http.Request) {
 	id := strings.TrimPrefix(r.URL.Path, "/api/products/")
 	productId, err := strconv.Atoi(id)
 
@@ -119,7 +119,7 @@ func (h *ProductHandlers) Update(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(product)
 }
 
-func (h *ProductHandlers) Delete(w http.ResponseWriter, r *http.Request) {
+func (h *ProductHandler) Delete(w http.ResponseWriter, r *http.Request) {
 	id := strings.TrimPrefix(r.URL.Path, "/api/products/")
 	productId, err := strconv.Atoi(id)
 
