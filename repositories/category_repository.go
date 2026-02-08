@@ -6,15 +6,15 @@ import (
 	"go-kasir-api/models"
 )
 
-type CategoryRepositories struct {
+type CategoryRepository struct {
 	db *sql.DB
 }
 
-func NewCategoryRepositories(db *sql.DB) *CategoryRepositories {
-	return &CategoryRepositories{db: db}
+func NewCategoryRepository(db *sql.DB) *CategoryRepository {
+	return &CategoryRepository{db: db}
 }
 
-func (r *CategoryRepositories) GetAll() ([]models.Category, error) {
+func (r *CategoryRepository) GetAll() ([]models.Category, error) {
 	query := "SELECT id, name, description FROM categories ORDER BY id ASC"
 	rows, err := r.db.Query(query)
 	if err != nil {
@@ -34,7 +34,7 @@ func (r *CategoryRepositories) GetAll() ([]models.Category, error) {
 	return categories, nil
 }
 
-func (r *CategoryRepositories) Create(category models.Category) (models.Category, error) {
+func (r *CategoryRepository) Create(category models.Category) (models.Category, error) {
 	query := "INSERT INTO categories (name, description) VALUES ($1, $2) RETURNING id"
 	row := r.db.QueryRow(query, category.Name, category.Description)
 	var id int
@@ -46,7 +46,7 @@ func (r *CategoryRepositories) Create(category models.Category) (models.Category
 	return category, nil
 }
 
-func (r *CategoryRepositories) GetByID(id int) (models.Category, error) {
+func (r *CategoryRepository) GetByID(id int) (models.Category, error) {
 	query := "SELECT id, name, description FROM categories WHERE id = $1"
 	row := r.db.QueryRow(query, id)
 	var category models.Category
@@ -57,7 +57,7 @@ func (r *CategoryRepositories) GetByID(id int) (models.Category, error) {
 	return category, nil
 }
 
-func (r *CategoryRepositories) Update(id int, category models.Category) (models.Category, error) {
+func (r *CategoryRepository) Update(id int, category models.Category) (models.Category, error) {
 	query := "UPDATE categories SET name = $2, description = $3 WHERE id = $1 RETURNING id"
 	result, err := r.db.Exec(query, id, category.Name, category.Description)
 	if err != nil {
@@ -75,7 +75,7 @@ func (r *CategoryRepositories) Update(id int, category models.Category) (models.
 	return category, nil
 }
 
-func (r *CategoryRepositories) Delete(id int) error {
+func (r *CategoryRepository) Delete(id int) error {
 	query := "DELETE FROM categories WHERE id = $1"
 	result, err := r.db.Exec(query, id)
 	if err != nil {

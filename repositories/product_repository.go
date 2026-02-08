@@ -6,15 +6,15 @@ import (
 	"go-kasir-api/models"
 )
 
-type ProductRepositories struct {
+type ProductRepository struct {
 	db *sql.DB
 }
 
-func NewProductRepositories(db *sql.DB) *ProductRepositories {
-	return &ProductRepositories{db: db}
+func NewProductRepository(db *sql.DB) *ProductRepository {
+	return &ProductRepository{db: db}
 }
 
-func (r *ProductRepositories) GetAll(name string) ([]models.Product, error) {
+func (r *ProductRepository) GetAll(name string) ([]models.Product, error) {
 	args := []interface{}{}
 	query := `SELECT p.id, p.name, p.price, p.stock, p.category_id, 
 	          c.id, c.name, c.description 
@@ -48,7 +48,7 @@ func (r *ProductRepositories) GetAll(name string) ([]models.Product, error) {
 	return products, nil
 }
 
-func (r *ProductRepositories) Create(product models.Product) (models.Product, error) {
+func (r *ProductRepository) Create(product models.Product) (models.Product, error) {
 	query := "INSERT INTO products (name, price, stock, category_id) VALUES ($1, $2, $3, $4) RETURNING id"
 	row := r.db.QueryRow(query, product.Name, product.Price, product.Stock, product.CategoryID)
 	var id int
@@ -60,7 +60,7 @@ func (r *ProductRepositories) Create(product models.Product) (models.Product, er
 	return product, nil
 }
 
-func (r *ProductRepositories) GetByID(id int) (models.Product, error) {
+func (r *ProductRepository) GetByID(id int) (models.Product, error) {
 	query := `SELECT p.id, p.name, p.price, p.stock, p.category_id,
 	          c.id, c.name, c.description
 	          FROM products p
@@ -80,8 +80,8 @@ func (r *ProductRepositories) GetByID(id int) (models.Product, error) {
 	return product, nil
 }
 
-func (r *ProductRepositories) Update(id int, product models.Product) (models.Product, error) {
-	query := "UPDATE products SET name = $2, price = $3, stock = $4, category_id = $5 WHERE id = $1 RETURNING id"
+func (r *ProductRepository) Update(id int, product models.Product) (models.Product, error) {
+	query := "UPDATE products SET name = $2, price = $3, stock = $4, category_id = $5, updated_at = NOW() WHERE id = $1 RETURNING id"
 	result, err := r.db.Exec(query, id, product.Name, product.Price, product.Stock, product.CategoryID)
 	if err != nil {
 		return models.Product{}, err
@@ -98,7 +98,7 @@ func (r *ProductRepositories) Update(id int, product models.Product) (models.Pro
 	return product, nil
 }
 
-func (r *ProductRepositories) Delete(id int) error {
+func (r *ProductRepository) Delete(id int) error {
 	query := "DELETE FROM products WHERE id = $1"
 	result, err := r.db.Exec(query, id)
 	if err != nil {
